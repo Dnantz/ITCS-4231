@@ -57,7 +57,7 @@ public class FloorManager : MonoBehaviour
                             currentLoc[0]++;
                         break;
                     case 1:
-                        if (currentLoc[0] > 0)
+                        if (currentLoc[0] > 1)
                             currentLoc[0]--;
                         break;
                     case 2:
@@ -65,7 +65,7 @@ public class FloorManager : MonoBehaviour
                             currentLoc[1]++;
                         break;
                     case 3:
-                        if (currentLoc[1] > 0)
+                        if (currentLoc[1] > 1)
                             currentLoc[1]--;
                         break;
                 }
