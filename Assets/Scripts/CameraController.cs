@@ -11,10 +11,16 @@ public class CameraController : MonoBehaviour
 
     [Header("Defaults to GameObject named 'Player'")]
     public Transform target;
+    [Header("Camera offset from Player")]
     public float offsetX = 0f; //Customizable camera distance from player
     public float offsetY = 2f; //Customizable camera distance from player
     public float offsetZ = -4f; //Customizable camera distance from player
+    [Header("Camera speed")]
+    public float speedH = 2.0f;
+    public float speedV = 2.0f;
     private Vector3 offset;
+    private float yaw = 0.0f;
+    private float pitch = 0.0f;
     private bool isMirror = false;
     private Vector3 mirrorOffset;
     private Quaternion normalRot;
@@ -35,14 +41,20 @@ public class CameraController : MonoBehaviour
     void Update()
     {
         transform.position = target.position + offset; //Offsets camera from the player
-        transform.rotation = normalRot; //Returns camera rotation to normal after mirror
 
+        //Moves camera with mouse (Ideal for first-person but not the best for third-person)
+        yaw += speedH * Input.GetAxis("Mouse X");
+        pitch -= speedV * Input.GetAxis("Mouse Y");
+        transform.eulerAngles = new Vector3(pitch, yaw, 0.0f);
+        
+        //transform.rotation = normalRot; //Returns camera rotation to normal after mirror
         if (isMirror)
         {
             transform.position += mirrorOffset; //Adds mirror offset on top of normal offset
             
             transform.rotation = Quaternion.LookRotation(target.position - transform.position, Vector3.up); //All I know is this makes the camera rotate 180 degrees to face the player from the front
         }
+        
     }
 
     private void FixedUpdate()

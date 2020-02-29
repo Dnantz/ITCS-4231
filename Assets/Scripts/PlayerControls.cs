@@ -11,9 +11,9 @@ public class PlayerControls : MonoBehaviour
     [Header("Defaults to object script is placed on")]
     public Transform player; //What is being moved
     private Vector3 newPosition; //Where it is moving to
-    public float xSpeed; //Customizable speed in X direction
-    public float ySpeed; //Customizable speed in Y direction
-    public float zSpeed; //Customizable speed in Z direction
+    public float xSpeed = 1; //Customizable speed in X direction
+    public float ySpeed = 1; //Customizable speed in Y direction
+    public float zSpeed = 1; //Customizable speed in Z direction
     void Start()
     {
         if (player == null)
