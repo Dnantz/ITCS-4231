@@ -18,13 +18,14 @@ public class FloorManager : MonoBehaviour
      * 2 = Two Way
      * 3 = Three Way (may need more values to determine rotation)
      * 4 = Four Way
+     * 5 = Corner (may need more values to determine rotation)
      */
 
     [SerializeField] private GameObject room_4Way;
     [SerializeField] private GameObject room_3Way;
     [SerializeField] private GameObject room_2Way;
     [SerializeField] private GameObject room_1Way;
-    [SerializeField] private GameObject room_Empty;
+    [SerializeField] private GameObject room_Corner;
     [SerializeField] private Transform playerTrans;
     private const int roomOffset = 50;
 
@@ -37,7 +38,7 @@ public class FloorManager : MonoBehaviour
     {
         //initialize variables
         gridsize = 9;
-        startingLocation = new Vector3(playerTrans.position.x - roomOffset / 2, playerTrans.position.y - 1, playerTrans.position.z + roomOffset / 2);
+        startingLocation = new Vector3(playerTrans.position.x - roomOffset / 2, playerTrans.position.y - 2, playerTrans.position.z + roomOffset / 2);
         GameObject[,] floor = generateFloor(gridsize);
     }
 

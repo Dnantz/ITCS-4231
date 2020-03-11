@@ -5,6 +5,8 @@ using UnityEngine;
 public class RoomManager : MonoBehaviour
 {
     /*
+     * ANTIQUATED!
+     * 
      * Room Manager: Bookkeeping for every room spawned into the game
      */
 

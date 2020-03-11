@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 public class CameraController : MonoBehaviour
 {
     /*
+     * ANTIQUATED!
+     * 
      * Camera Controller: Has camera follow player and flip to show behind player
      */
 
