@@ -27,6 +27,11 @@ public class FloorManager : MonoBehaviour
     [SerializeField] private GameObject room_1Way;
     [SerializeField] private GameObject room_Corner;
     [SerializeField] private Transform playerTrans;
+    public GameObject[,] floor;
+    public GameObject currentRoom;
+    public GameObject oldCurrentRoom;
+    public GameObject mainCanvas;
+    public MinimapManager mmManager;
     private const int roomOffset = 50;
 
     int gridsize;
@@ -39,7 +44,10 @@ public class FloorManager : MonoBehaviour
         //initialize variables
         gridsize = 9;
         startingLocation = new Vector3(playerTrans.position.x - roomOffset / 2, playerTrans.position.y - 2, playerTrans.position.z + roomOffset / 2);
-        GameObject[,] floor = generateFloor(gridsize);
+        floor = generateFloor(gridsize);
+
+        mainCanvas = GameObject.FindGameObjectWithTag("Canvas");
+        mmManager = mainCanvas.GetComponent<MinimapManager>();
     }
 
     // Update is called once per frame
@@ -64,7 +72,10 @@ public class FloorManager : MonoBehaviour
         int[] center = { size / 2, size / 2 };
 
         //create starting room
-        rooms[currentLoc[0],currentLoc[1]] = Instantiate(room_4Way, startingLocation, Quaternion.identity);
+        //rooms[currentLoc[0],currentLoc[1]] = Instantiate(room_4Way, startingLocation, Quaternion.identity);
+        rooms[currentLoc[0], currentLoc[1]] = Instantiate(room_4Way, new Vector3((currentLoc[0] - center[0]) * roomOffset + startingLocation.x, startingLocation.y, -roomOffset + startingLocation.z + (currentLoc[1] - center[1]) * roomOffset), Quaternion.identity);
+        rooms[currentLoc[0], currentLoc[1]].name = "centerRoom";
+        currentRoom = rooms[currentLoc[0], currentLoc[1]];
         Debug.Log("Center at " + center[0].ToString() + "," + center[1].ToString());
         numOfRoomsCreated++;
 
@@ -107,5 +118,16 @@ public class FloorManager : MonoBehaviour
         }
         Debug.Log("Number of Total Rooms: " + numOfRoomsCreated.ToString());
         return rooms;
+    }
+
+    public void setCurrentRoom(GameObject cRoom)
+    {
+        if (cRoom != currentRoom)
+        {
+            oldCurrentRoom = currentRoom;
+            currentRoom = cRoom;
+            mmManager.updateMap(currentRoom, "red");
+            mmManager.updateMap(oldCurrentRoom, "white");
+        }
     }
 }
