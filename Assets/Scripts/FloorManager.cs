@@ -5,20 +5,16 @@ using UnityEngine;
 public class FloorManager : MonoBehaviour
 {
     /*
-     * Potential way to handle rooms with different number of doors:
-     * Create the randomized pathway in a seperate 2D array and use
-     * that to determine what number of doors are needed. And that
-     * way, the rooms can even hold off from being loaded!
+     * rooms will be assigned a number based on the rooms surroinding them.
+     * The final room number will be a composite of the numbers assigned from each entrance
      * 
-     * The 2D array can hold an int that increments when it counts
-     * surrounding rooms:
-     * -1 = No room
-     * 0 = Undetermined (for when we first populate the pathway)
-     * 1 = One Way
-     * 2 = Two Way
-     * 3 = Three Way (may need more values to determine rotation)
-     * 4 = Four Way
-     * 5 = Corner (may need more values to determine rotation)
+     * S = 1
+     * E = 2
+     * N = 4
+     * W = 8
+     * 
+     * So if there are entrances to the north and east, it will be room type 4 + 2 = 6
+     * this is handled by a corner room rotated appropriately
      */
 
     [SerializeField] private GameObject room_4Way;
@@ -27,7 +23,7 @@ public class FloorManager : MonoBehaviour
     [SerializeField] private GameObject room_1Way;
     [SerializeField] private GameObject room_Corner;
     [SerializeField] private Transform playerTrans;
-    private const int roomOffset = 50;
+    private const int roomOffset = 50; //total side length of a room
 
     int gridsize;
     int numOfRoomsCreated = 0;
@@ -38,7 +34,7 @@ public class FloorManager : MonoBehaviour
     {
         //initialize variables
         gridsize = 9;
-        startingLocation = new Vector3(playerTrans.position.x - roomOffset / 2, playerTrans.position.y - 2, playerTrans.position.z + roomOffset / 2);
+        startingLocation = new Vector3(playerTrans.position.x, playerTrans.position.y - 2, playerTrans.position.z);
         GameObject[,] floor = generateFloor(gridsize);
     }
 
@@ -51,12 +47,14 @@ public class FloorManager : MonoBehaviour
     GameObject[,] generateFloor(int size, int maxRooms = 10)
     {
         GameObject[,] rooms = new GameObject[size + 1, size + 1];
+        bool[,] rooms_b = new bool[size + 1, size + 1];
         //start with nothing
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
             {
                 rooms[i, j] = null;
+                rooms_b[i,j] = false;
             }
         }
 
@@ -64,7 +62,7 @@ public class FloorManager : MonoBehaviour
         int[] center = { size / 2, size / 2 };
 
         //create starting room
-        rooms[currentLoc[0],currentLoc[1]] = Instantiate(room_4Way, startingLocation, Quaternion.identity);
+        rooms_b[currentLoc[0],currentLoc[1]] = true;
         Debug.Log("Center at " + center[0].ToString() + "," + center[1].ToString());
         numOfRoomsCreated++;
 
@@ -79,7 +77,7 @@ public class FloorManager : MonoBehaviour
                 switch (rng)
                 {
                     case 0:
-                        if(currentLoc[0] < size)
+                        if(currentLoc[0] < size - 1)
                             currentLoc[0]++;
                         break;
                     case 1:
@@ -87,7 +85,7 @@ public class FloorManager : MonoBehaviour
                             currentLoc[0]--;
                         break;
                     case 2:
-                        if (currentLoc[1] < size)
+                        if (currentLoc[1] < size - 1)
                             currentLoc[1]++;
                         break;
                     case 3:
@@ -97,13 +95,132 @@ public class FloorManager : MonoBehaviour
                 }
                 if (++loops >= 100)
                     break;
-            } while (rooms[currentLoc[0], currentLoc[1]] != null);
-            Debug.Log("making room at " + currentLoc[0].ToString() + "," + currentLoc[1].ToString());
-            if (rooms[currentLoc[0], currentLoc[1]] == null) {
-                rooms[currentLoc[0], currentLoc[1]] = Instantiate(room_4Way, new Vector3((currentLoc[0] - center[0]) * roomOffset + startingLocation.x, startingLocation.y, -roomOffset + startingLocation.z + (currentLoc[1] - center[1]) * roomOffset), Quaternion.identity);
+            } while (rooms_b[currentLoc[0], currentLoc[1]]);
+            Debug.Log("deciding there is a room at " + currentLoc[0].ToString() + "," + currentLoc[1].ToString());
+            if (!rooms_b[currentLoc[0], currentLoc[1]])
+            {
+                //there should be a room here
+                rooms_b[currentLoc[0], currentLoc[1]] = true;
                 numOfRoomsCreated++;
             }
-            
+        }
+        //set room to the proper type
+        for (int i = 0; i < rooms.GetLength(0); i++)
+        {
+            for (int j = 0; j < rooms.GetLength(1); j++)
+            {
+                //if there should be a room here
+                if (rooms_b[i,j])
+                {
+                    byte roomtype = 0; //dat efficiency
+
+                    //is there a room to the south
+                    if (rooms_b[i, j - 1])
+                        roomtype += 1;
+                    //is there a room to the east
+                    if (rooms_b[i + 1, j])
+                        roomtype += 2;
+                    //is there a room to the north
+                    if (rooms_b[i, j + 1])
+                        roomtype += 4;
+                    //is there a room to the west
+                    if (rooms_b[i - 1, j])
+                        roomtype += 8;
+
+                    //spawn the rooms
+                    switch (roomtype)
+                    {
+                        case 1: //S
+                            rooms[i,j] = Instantiate(room_1Way, new Vector3((i - center[0]) * roomOffset + startingLocation.x, startingLocation.y, startingLocation.z + (j - center[1]) * roomOffset), Quaternion.identity);
+                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x - 25, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z);
+                            Debug.Log("making S room at " + i.ToString() + "," + j.ToString() + " with coordinates " + rooms[i,j].transform.position.x.ToString() + "," + rooms[i,j].transform.position.z.ToString());
+                            break;
+                        case 2: //E
+                            rooms[i, j] = Instantiate(room_1Way, new Vector3((i - center[0]) * roomOffset + startingLocation.x, startingLocation.y, startingLocation.z + (j - center[1]) * roomOffset), Quaternion.identity);
+                            rooms[i, j].transform.Rotate(new Vector3(0, 270, 0));
+                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z - 25);
+                            Debug.Log("making E room at " + i.ToString() + "," + j.ToString() + " with coordinates " + rooms[i,j].transform.position.x.ToString() + "," + rooms[i,j].transform.position.z.ToString());
+                            break;
+                        case 3: //SE
+                            rooms[i, j] = Instantiate(room_Corner, new Vector3((i - center[0]) * roomOffset + startingLocation.x, startingLocation.y, startingLocation.z + (j - center[1]) * roomOffset), Quaternion.identity);
+                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x - 25, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z);
+                            Debug.Log("making SE room at " + i.ToString() + "," + j.ToString() + " with coordinates " + rooms[i,j].transform.position.x.ToString() + "," + rooms[i,j].transform.position.z.ToString());
+                            break;
+                        case 4: //N
+                            rooms[i, j] = Instantiate(room_1Way, new Vector3((i - center[0]) * roomOffset + startingLocation.x, startingLocation.y, startingLocation.z + (j - center[1]) * roomOffset), Quaternion.identity);
+                            rooms[i, j].transform.Rotate(new Vector3(0, 180, 0));
+                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x + 25, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z);
+                            Debug.Log("making N room at " + i.ToString() + "," + j.ToString() + " with coordinates " + rooms[i,j].transform.position.x.ToString() + "," + rooms[i,j].transform.position.z.ToString());
+                            break;
+                        case 5: //NS
+                            rooms[i, j] = Instantiate(room_2Way, new Vector3((i - center[0]) * roomOffset + startingLocation.x, startingLocation.y, startingLocation.z + (j - center[1]) * roomOffset), Quaternion.identity);
+                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x - 25, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z);
+                            Debug.Log("making NS room at " + i.ToString() + "," + j.ToString() + " with coordinates " + rooms[i,j].transform.position.x.ToString() + "," + rooms[i,j].transform.position.z.ToString());
+                            break;
+                        case 6: //NE
+                            rooms[i, j] = Instantiate(room_Corner, new Vector3((i - center[0]) * roomOffset + startingLocation.x, startingLocation.y, startingLocation.z + (j - center[1]) * roomOffset), Quaternion.identity);
+                            rooms[i, j].transform.Rotate(new Vector3(0, 270, 0));
+                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z - 25);
+                            Debug.Log("making NE room at " + i.ToString() + "," + j.ToString() + " with coordinates " + rooms[i,j].transform.position.x.ToString() + "," + rooms[i,j].transform.position.z.ToString());
+                            break;
+                        case 7: //NSE
+                            rooms[i,j] = Instantiate(room_3Way, new Vector3((i - center[0]) * roomOffset + startingLocation.x, startingLocation.y, startingLocation.z + (j - center[1]) * roomOffset), Quaternion.identity);
+                            rooms[i, j].transform.Rotate(new Vector3(0, 270, 0));
+                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z +25);
+                            Debug.Log("making NSE room at " + i.ToString() + "," + j.ToString() + " with coordinates " + rooms[i,j].transform.position.x.ToString() + "," + rooms[i,j].transform.position.z.ToString());
+                            break;
+                        case 8: //W
+                            rooms[i,j] = Instantiate(room_1Way, new Vector3((i - center[0]) * roomOffset + startingLocation.x, startingLocation.y, startingLocation.z + (j - center[1]) * roomOffset), Quaternion.identity);
+                            rooms[i, j].transform.Rotate(new Vector3(0,90,0));
+                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z + 25);
+                            Debug.Log("making W room at " + i.ToString() + "," + j.ToString() + " with coordinates " + rooms[i,j].transform.position.x.ToString() + "," + rooms[i,j].transform.position.z.ToString());
+                            break;
+                        case 9: //SW
+                            rooms[i,j] = Instantiate(room_Corner, new Vector3((i - center[0]) * roomOffset + startingLocation.x, startingLocation.y, startingLocation.z + (j - center[1]) * roomOffset), Quaternion.identity);
+                            rooms[i, j].transform.Rotate(new Vector3(0, 90, 0));
+                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z + 25);
+                            Debug.Log("making SW room at " + i.ToString() + "," + j.ToString() + " with coordinates " + rooms[i,j].transform.position.x.ToString() + "," + rooms[i,j].transform.position.z.ToString());
+                            break;
+                        case 10: //EW
+                            rooms[i,j] = Instantiate(room_2Way, new Vector3((i - center[0]) * roomOffset + startingLocation.x, startingLocation.y, startingLocation.z + (j - center[1]) * roomOffset), Quaternion.identity);
+                            rooms[i, j].transform.Rotate(new Vector3(0, 90, 0));
+                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z + 25);
+                            Debug.Log("making EW room at " + i.ToString() + "," + j.ToString() + " with coordinates " + rooms[i,j].transform.position.x.ToString() + "," + rooms[i,j].transform.position.z.ToString());
+                            break;
+                        case 11: //SEW
+                            rooms[i,j] = Instantiate(room_3Way, new Vector3((i - center[0]) * roomOffset + startingLocation.x, startingLocation.y, startingLocation.z + (j - center[1]) * roomOffset), Quaternion.identity);
+                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x - 25, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z);
+                            Debug.Log("making SEW room at " + i.ToString() + "," + j.ToString() + " with coordinates " + rooms[i,j].transform.position.x.ToString() + "," + rooms[i,j].transform.position.z.ToString());
+                            break;
+                        case 12: //NW
+                            rooms[i,j] = Instantiate(room_Corner, new Vector3((i - center[0]) * roomOffset + startingLocation.x, startingLocation.y, startingLocation.z + (j - center[1]) * roomOffset), Quaternion.identity);
+                            rooms[i, j].transform.Rotate(new Vector3(0, 180, 0));
+                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x + 25, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z);
+                            Debug.Log("making NW room at " + i.ToString() + "," + j.ToString() + " with coordinates " + rooms[i,j].transform.position.x.ToString() + "," + rooms[i,j].transform.position.z.ToString());
+                            break;
+                        case 13: //NSW
+                            rooms[i,j] = Instantiate(room_3Way, new Vector3((i - center[0]) * roomOffset + startingLocation.x, startingLocation.y, startingLocation.z + (j - center[1]) * roomOffset), Quaternion.identity);
+                            rooms[i, j].transform.Rotate(new Vector3(0, 90, 0));
+                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z + 25);
+                            Debug.Log("making NSW room at " + i.ToString() + "," + j.ToString() + " with coordinates " + rooms[i,j].transform.position.x.ToString() + "," + rooms[i,j].transform.position.z.ToString());
+                            break;
+                        case 14: //NEW
+                            rooms[i,j] = Instantiate(room_3Way, new Vector3((i - center[0]) * roomOffset + startingLocation.x, startingLocation.y, startingLocation.z + (j - center[1]) * roomOffset), Quaternion.identity);
+                            rooms[i, j].transform.Rotate(new Vector3(0, 180, 0));
+                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x + 25, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z);
+                            Debug.Log("making NEW room at " + i.ToString() + "," + j.ToString() + " with coordinates " + rooms[i,j].transform.position.x.ToString() + "," + rooms[i,j].transform.position.z.ToString());
+                            break;
+                        case 15: //NSEW
+                            rooms[i,j] = Instantiate(room_4Way, new Vector3((i - center[0]) * roomOffset + startingLocation.x, startingLocation.y, startingLocation.z + (j - center[1]) * roomOffset), Quaternion.identity);
+                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x - 25, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z + 25);
+                            Debug.Log("making NSEW room at " + i.ToString() + "," + j.ToString() + " with coordinates " + rooms[i,j].transform.position.x.ToString() + "," + rooms[i,j].transform.position.z.ToString());
+                            break;
+                        default:
+                            Debug.Log("Invalid rotation: " + roomtype.ToString());
+                            break;
+                    }
+                }
+            }
         }
         Debug.Log("Number of Total Rooms: " + numOfRoomsCreated.ToString());
         return rooms;
