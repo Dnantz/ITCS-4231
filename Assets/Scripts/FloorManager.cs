@@ -25,6 +25,12 @@ public class FloorManager : MonoBehaviour
     [SerializeField] private Transform playerTrans;
     private const int roomOffset = 50; //total side length of a room
 
+    public GameObject[,] floor;
+    public GameObject currentRoom;
+    public GameObject oldCurrentRoom;
+    public GameObject mainCanvas;
+    public MinimapManager mmManager;
+
     int gridsize;
     int numOfRoomsCreated = 0;
     Vector3 startingLocation;
@@ -35,13 +41,27 @@ public class FloorManager : MonoBehaviour
         //initialize variables
         gridsize = 9;
         startingLocation = new Vector3(playerTrans.position.x, playerTrans.position.y - 2, playerTrans.position.z);
-        GameObject[,] floor = generateFloor(gridsize);
+        floor = generateFloor(gridsize);
+
+        mainCanvas = GameObject.FindGameObjectWithTag("Canvas");
+        mmManager = mainCanvas.GetComponent<MinimapManager>();
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    public void setCurrentRoom(GameObject cRoom)
+    {
+        if (cRoom != currentRoom)
+        {
+            oldCurrentRoom = currentRoom;
+            currentRoom = cRoom;
+            mmManager.updateMap(currentRoom, "red");
+            mmManager.updateMap(oldCurrentRoom, "white");
+        }
     }
 
     GameObject[,] generateFloor(int size, int maxRooms = 10)
@@ -166,7 +186,7 @@ public class FloorManager : MonoBehaviour
                         case 7: //NSE
                             rooms[i,j] = Instantiate(room_3Way, new Vector3((i - center[0]) * roomOffset + startingLocation.x, startingLocation.y, startingLocation.z + (j - center[1]) * roomOffset), Quaternion.identity);
                             rooms[i, j].transform.Rotate(new Vector3(0, 270, 0));
-                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z +25);
+                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z - 25);
                             Debug.Log("making NSE room at " + i.ToString() + "," + j.ToString() + " with coordinates " + rooms[i,j].transform.position.x.ToString() + "," + rooms[i,j].transform.position.z.ToString());
                             break;
                         case 8: //W
@@ -212,7 +232,7 @@ public class FloorManager : MonoBehaviour
                             break;
                         case 15: //NSEW
                             rooms[i,j] = Instantiate(room_4Way, new Vector3((i - center[0]) * roomOffset + startingLocation.x, startingLocation.y, startingLocation.z + (j - center[1]) * roomOffset), Quaternion.identity);
-                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x - 25, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z + 25);
+                            rooms[i, j].transform.position = new Vector3(rooms[i, j].transform.position.x - 25, rooms[i, j].transform.position.y, rooms[i, j].transform.position.z);
                             Debug.Log("making NSEW room at " + i.ToString() + "," + j.ToString() + " with coordinates " + rooms[i,j].transform.position.x.ToString() + "," + rooms[i,j].transform.position.z.ToString());
                             break;
                         default:
