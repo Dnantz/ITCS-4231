@@ -358,7 +358,11 @@ public class CoverBehaviour : GenericBehaviour
 	// Hide the cover signs.
 	void UndrawSign(GameObject sign)
 	{
-			sign.SetActive (false);
+		/*
+		 * TURNING OFF TO HIDE ERRORS 3/27
+		 * 
+		 * sign.SetActive (false);
+		*/
 	}
 
 	// Hide the path to cover.
