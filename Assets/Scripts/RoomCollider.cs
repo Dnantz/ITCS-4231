@@ -11,6 +11,7 @@ public class RoomCollider : MonoBehaviour
     public GameObject room; //Passed in from RoomIdentifier
     public GameObject player;
     public FloorManager fm;
+    public GameObject currentRoom;
 
     // Start is called before the first frame update
     void Start()
@@ -27,7 +28,9 @@ public class RoomCollider : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        if (other.gameObject.tag == "Player")
+        currentRoom = fm.currentRoom;
+
+        if (other.gameObject.tag == "Player" && currentRoom != room)
         {
             fm.setCurrentRoom(room);
         }

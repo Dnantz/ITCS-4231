@@ -55,12 +55,23 @@ public class FloorManager : MonoBehaviour
 
     public void setCurrentRoom(GameObject cRoom)
     {
+        Debug.Log("Setting Current Room");
+
         if (cRoom != currentRoom)
         {
-            oldCurrentRoom = currentRoom;
-            currentRoom = cRoom;
-            mmManager.updateMap(currentRoom, "red");
-            mmManager.updateMap(oldCurrentRoom, "white");
+            if (oldCurrentRoom != null)
+            {
+                oldCurrentRoom = currentRoom;
+                currentRoom = cRoom;
+                mmManager.updateMap(currentRoom, "red");
+                mmManager.updateMap(oldCurrentRoom, "white");
+            }
+            else
+            {
+                oldCurrentRoom = cRoom;
+                currentRoom = cRoom;
+                mmManager.updateMap(currentRoom, "red");
+            }
         }
     }
 

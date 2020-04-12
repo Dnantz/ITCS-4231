@@ -19,6 +19,7 @@ public class MinimapManager : MonoBehaviour
     int floorLength = 10;
     Texture2D emptySquare;
     Texture2D centerSquare;
+    Texture2D blankSquare;
     Texture2D[,] mapGrid;
     int mapRStart = -1;
     int mapREnd = -1;
@@ -225,11 +226,15 @@ public class MinimapManager : MonoBehaviour
                     if (color.Equals("red"))
                     {
                         mapGrid[i, j] = centerSquare;
+                        Debug.Log("Updated Minimap");
+                        break;
                     }
 
                     if (color.Equals("white"))
                     {
                         mapGrid[i, j] = emptySquare;
+                        Debug.Log("Updated Minimap");
+                        break;
                     }
                 }
             }
