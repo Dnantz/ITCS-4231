@@ -1,0 +1,26 @@
+fileFormatVersion: 2
+guid: 41b40089dcb12fe48a8c16352819d133
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - room_4Way: {fileID: 371956314424847320, guid: e472a0dc27a0f654b83f27a26f0c6b94,
+      type: 3}
+  - room_3Way: {fileID: 506847384802990404, guid: dcdaae2ba256abc48a5888713505d469,
+      type: 3}
+  - room_2Way: {fileID: 4980224428274868161, guid: 68046ff0144fd4549b105dfba0575ca4,
+      type: 3}
+  - room_1Way: {fileID: 2178179422653622706, guid: 7783a3e169322674fbb88ef354aefd33,
+      type: 3}
+  - room_Corner: {fileID: 3147776317283377808, guid: 54cc7b04f65249943b57d085a6408ace,
+      type: 3}
+  - playerTrans: {instanceID: 0}
+  - currentRoom: {instanceID: 0}
+  - oldCurrentRoom: {instanceID: 0}
+  - mainCanvas: {instanceID: 0}
+  - mmManager: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
