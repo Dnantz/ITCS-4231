@@ -32,29 +32,11 @@ public class MinimapManager : MonoBehaviour
     void Start()
     {
         fm = player.GetComponent<FloorManager>();
-        floor = fm.floor;
         emptySquare = Resources.Load("minimapSquare") as Texture2D;
         centerSquare = Resources.Load("centerSquare") as Texture2D;
         bool boolC = false;
         bool boolR = false;
-
-        Debug.Log("FLOOR ARRAY:");
-        //Print floor array
-        for (int i=0; i < 10; i++)
-        {
-            string rowString = null;
-            for (int j=0; j < 10; j++)
-            {
-                if (floor[i,j] != null)
-                {
-                    rowString += "X ";
-                } else
-                {
-                    rowString += "- ";
-                }
-            }
-            Debug.Log(rowString);
-        }
+    }
 
         /*
         //Count how many occupied rows and columns there are
@@ -140,6 +122,28 @@ public class MinimapManager : MonoBehaviour
             }
         }
         */
+        public void generate()
+    {
+        floor = fm.floor;
+        Debug.Log("FLOOR ARRAY:");
+        Debug.Log(floor[1, 1]);
+        //Print floor array
+        for (int i = 0; i < 10; i++)
+        {
+            string rowString = null;
+            for (int j = 0; j < 10; j++)
+            {
+                if (floor[i, j] != null)
+                {
+                    rowString += "X ";
+                }
+                else
+                {
+                    rowString += "- ";
+                }
+            }
+            Debug.Log(rowString);
+        }
 
         mapGrid = new Texture2D[10,10];
 
@@ -171,7 +175,7 @@ public class MinimapManager : MonoBehaviour
                 if (mapGrid[i, j] != null)
                 {
                     //minimapSquareNum++;
-                    GUI.DrawTexture(new Rect(i * squareSize, j * squareSize, squareSize, squareSize), mapGrid[i, j]);
+                    GUI.DrawTexture(new Rect(50 + i * squareSize, 50 + j * squareSize, squareSize, squareSize), mapGrid[i, j]);
                     //Change color to black if there is a room
                     //mapGrid[i, j].SetPixel(0, 0, Color.black);
                     //mapGrid[i, j].Apply();
@@ -181,7 +185,7 @@ public class MinimapManager : MonoBehaviour
             }
         }
 
-        //Debug.Log(minimapSquareNum);
+
     }
     
     void OnGUI()

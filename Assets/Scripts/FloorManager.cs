@@ -45,6 +45,9 @@ public class FloorManager : MonoBehaviour
 
         mainCanvas = GameObject.FindGameObjectWithTag("Canvas");
         mmManager = mainCanvas.GetComponent<MinimapManager>();
+        mmManager.generate();
+
+        Debug.Log("Floor Manager initialized");
     }
 
     // Update is called once per frame

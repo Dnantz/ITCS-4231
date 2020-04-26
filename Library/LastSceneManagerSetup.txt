@@ -1,5 +1,5 @@
 sceneSetups:
-- path: Assets/NDIA_Character/NDIA_Scenes/NDIA_Character_Controller_Scene.unity
+- path: Assets/Scenes/EndScene.unity
   isLoaded: 1
   isActive: 1
   isSubScene: 0

@@ -19,7 +19,9 @@ public class TitleScreenMenu : MonoBehaviour
 
     public void startGame()
     {
-        SceneManager.LoadScene("FloorGeneratorTest");
+        Cursor.visible = false;
+        SceneManager.LoadScene("NDIA_Character_Controller_Scene");
+        
     }
 
     //Called during Fullscreen Toggle
