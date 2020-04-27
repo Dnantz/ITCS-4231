@@ -36,8 +36,9 @@ public class EnemyManager : MonoBehaviour
 
     public void kill()
     {
-            Debug.Log("Enemy Killed!");
-            pm.addTime(10);
-            Destroy(this.gameObject);
+        Debug.Log("Enemy Killed!");
+        pm.addTime(10);
+        Destroy(this.gameObject);
+        
     }
 }

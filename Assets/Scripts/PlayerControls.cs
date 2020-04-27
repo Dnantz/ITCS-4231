@@ -54,5 +54,4 @@ public class PlayerControls : MonoBehaviour
             player.position = newPosition;
         }
     }
-
 }

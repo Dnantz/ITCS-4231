@@ -50,10 +50,27 @@ public class FloorManager : MonoBehaviour
         Debug.Log("Floor Manager initialized");
     }
 
-    // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        
+        if (Globals.getRemainingEnemyCount() == 0)
+        {
+            Debug.Log("No enemies remaining, moving to next floor");
+            Globals.timescale += 0.2f;
+            UnityEngine.SceneManagement.SceneManager.LoadScene("NDIA_Character_Controller_Scene");
+        }
+
+        // kill all enemies utility
+        if (Input.GetKey(KeyCode.K))
+        {
+            GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+            Debug.Log("Found " + enemies.Length + " enemies");
+            foreach (var enemy in enemies)
+            {
+                Debug.Log("Killed " + enemy.ToString());
+                EnemyManager script = (EnemyManager)enemy.GetComponent(typeof(EnemyManager));
+                script.kill();
+            }
+        }
     }
 
     public void setCurrentRoom(GameObject cRoom)
