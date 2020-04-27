@@ -27,8 +27,23 @@ public class PauseMenuControls: MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //Pause
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Debug.Log("Pause Game");
+            paused = !paused;
+        }
+
+        pauseMenu.SetActive(paused);
+        Cursor.visible = paused;
+
         //Place-holder timer countdown
-        timeLeft -= Time.deltaTime;
+        if (!paused)
+        {
+            timeLeft -= Time.deltaTime;
+            
+        }
+
         if (timeDisplay != null && timeLeft >= 0f)
         {
             timeDisplay.text = "Time Left: " + timeLeft.ToString("0");
@@ -42,15 +57,7 @@ public class PauseMenuControls: MonoBehaviour
             Cursor.visible = true;
         }
 
-        //Pause
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Debug.Log("Pause Game");
-            paused = !paused;
-        }
-
-        pauseMenu.SetActive(paused);
-        Cursor.visible = paused;
+        
     }
 
     //Called during Fullscreen Toggle
@@ -75,6 +82,18 @@ public class PauseMenuControls: MonoBehaviour
     public void startGame()
     {
         SceneManager.LoadScene("NDIA_Character_Controller_Scene");
+    }
+
+    public void subtractTime(int time)
+    {
+        Debug.Log("Time Lost");
+        timeLeft -= time;
+    }
+
+    public void addTime(int time)
+    {
+        Debug.Log("Time Extended");
+        timeLeft += time;
     }
 
 

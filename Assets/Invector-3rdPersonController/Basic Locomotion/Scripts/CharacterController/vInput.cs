@@ -173,7 +173,9 @@ namespace Invector.vCharacterController
             {
                 return true;
             }
+            
 
+            /*
             // joystick axis
             if (Input.GetAxis("LeftAnalogHorizontal") != 0.0f || 
                 Input.GetAxis("LeftAnalogVertical") != 0.0f ||
@@ -186,6 +188,7 @@ namespace Invector.vCharacterController
             {
                 return true;
             }
+            */
             return false;
         }
 
