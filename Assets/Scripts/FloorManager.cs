@@ -34,6 +34,7 @@ public class FloorManager : MonoBehaviour
     int gridsize;
     int numOfRoomsCreated = 0;
     Vector3 startingLocation;
+    bool started;
 
     // Start is called before the first frame update
     void Start()
@@ -49,16 +50,20 @@ public class FloorManager : MonoBehaviour
 
         Debug.Log("Floor Manager initialized");
         Debug.Log("timescale:" + Time.timeScale);
+        started = false;
     }
 
     void FixedUpdate()
     {
-        if (Globals.getRemainingEnemyCount() == 0)
+        
+        if (Globals.getRemainingEnemyCount() == 0 && started)
         {
             Debug.Log("No enemies remaining, moving to next floor");
             Time.timeScale += 0.2f;
+            started = false;
             UnityEngine.SceneManagement.SceneManager.LoadScene("NDIA_Character_Controller_Scene");
         }
+        
 
         // kill all enemies utility
         if (Input.GetKey(KeyCode.K))
@@ -84,6 +89,7 @@ public class FloorManager : MonoBehaviour
             {
                 oldCurrentRoom = currentRoom;
                 currentRoom = cRoom;
+                cRoom.GetComponent<RoomIdentifier>().spawn();
                 mmManager.updateMap(currentRoom, "red");
                 mmManager.updateMap(oldCurrentRoom, "white");
             }
@@ -91,6 +97,8 @@ public class FloorManager : MonoBehaviour
             {
                 oldCurrentRoom = cRoom;
                 currentRoom = cRoom;
+                cRoom.GetComponent<RoomIdentifier>().spawn();
+                started = true;
                 mmManager.updateMap(currentRoom, "red");
             }
         }

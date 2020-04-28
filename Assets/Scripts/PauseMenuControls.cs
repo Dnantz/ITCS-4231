@@ -11,7 +11,6 @@ public class PauseMenuControls: MonoBehaviour
     [SerializeField] GameObject timeDisplayObj;
     TextMeshProUGUI timeDisplay;
     bool paused = false;
-    bool end = false;
     float timeLeft = 100.0f;
 
     // Start is called before the first frame update
@@ -49,11 +48,10 @@ public class PauseMenuControls: MonoBehaviour
             timeDisplay.text = "Time Left: " + timeLeft.ToString("0");
         }
 
-        if (timeLeft < 0 && !end)
+        if (timeLeft < 0)
         {
             Debug.Log("TIME'S UP");
             SceneManager.LoadScene("EndScene");
-            end = true;
             Cursor.visible = true;
         }
 
@@ -76,7 +74,6 @@ public class PauseMenuControls: MonoBehaviour
     public void toMain()
     {
         SceneManager.LoadScene("TitleScene");
-        end = false;
     }
 
     public void startGame()
@@ -94,6 +91,16 @@ public class PauseMenuControls: MonoBehaviour
     {
         Debug.Log("Time Extended");
         timeLeft += time;
+    }
+
+    public void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Bullet")
+        {
+            Debug.Log("SHOT");
+            subtractTime(10);
+            Destroy(collision.gameObject);
+        }
     }
 
 
