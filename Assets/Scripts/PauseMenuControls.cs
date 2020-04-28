@@ -4,14 +4,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using Invector.vCharacterController;
 
 public class PauseMenuControls: MonoBehaviour
 {
     [SerializeField] GameObject pauseMenu;
     [SerializeField] GameObject timeDisplayObj;
+    GameObject player;
+    vThirdPersonController v3p;
     TextMeshProUGUI timeDisplay;
-    bool paused = false;
-    float timeLeft = 100.0f;
+    public bool paused = false;
+    public float timeLeft = 100.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -21,6 +24,9 @@ public class PauseMenuControls: MonoBehaviour
         {
             timeDisplay = timeDisplayObj.GetComponent<TextMeshProUGUI>();
         }
+
+        player = GameObject.FindGameObjectWithTag("Player");
+        v3p = player.GetComponent<vThirdPersonController>();
     }
 
     // Update is called once per frame
@@ -35,6 +41,7 @@ public class PauseMenuControls: MonoBehaviour
 
         pauseMenu.SetActive(paused);
         Cursor.visible = paused;
+        player.SetActive(!paused);
 
         //Place-holder timer countdown
         if (!paused)
@@ -73,6 +80,7 @@ public class PauseMenuControls: MonoBehaviour
 
     public void toMain()
     {
+        Debug.Log("Exiting To Main Menu...");
         SceneManager.LoadScene("TitleScene");
     }
 
@@ -93,15 +101,7 @@ public class PauseMenuControls: MonoBehaviour
         timeLeft += time;
     }
 
-    public void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.tag == "Bullet")
-        {
-            Debug.Log("SHOT");
-            subtractTime(10);
-            Destroy(collision.gameObject);
-        }
-    }
+    
 
 
 

@@ -9,11 +9,19 @@ public class RoomIdentifier : MonoBehaviour
      */
     Component[] components;
     [SerializeField] GameObject[] enemies;
+    GameObject mainCanvas;
+    MinimapManager mm;
+    FloorManager fm;
+    public int enemiesLeft = 0;
+    public bool cleared = false;
+    public bool currentRoom = false;
 
     // Start is called before the first frame update
     void Start()
     {
         components = GetComponentsInChildren<RoomCollider>();
+        mainCanvas = GameObject.FindGameObjectWithTag("Canvas");
+        mm = mainCanvas.GetComponent<MinimapManager>();
 
         foreach (RoomCollider collider in components)
         {
@@ -25,15 +33,29 @@ public class RoomIdentifier : MonoBehaviour
             EnemyManager em = enemy.GetComponent<EnemyManager>();
             em.room = this.gameObject;
             enemy.SetActive(false);
+            enemiesLeft++;
         }
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        
+        if (!cleared && enemiesLeft > 0)
+        {
+            enemiesLeft = 0;
+            foreach (GameObject enemy in enemies)
+            {
+                if (enemy != null)
+                    enemiesLeft++;
+            }
+        } else if (!cleared)
+        {
+            Debug.Log("Room Cleared!");
+            mm.updateMap(this.gameObject, "green");
+            cleared = true;
+        }
     }
-
+    /*
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Player")
@@ -41,13 +63,28 @@ public class RoomIdentifier : MonoBehaviour
             Debug.Log("Entered New Room");
         }
     }
+    */
 
     public void spawn()
     {
+        currentRoom = true;
+        
         Debug.Log("Spawning Enemies");
         foreach (GameObject enemy in enemies)
         {
+            if (enemy != null)
             enemy.SetActive(true);
+        }
+    }
+
+    public void despawn()
+    {
+        currentRoom = false;
+        Debug.Log("Despawning Enemies");
+        foreach (GameObject enemy in enemies)
+        {
+            if (enemy != null)
+            enemy.SetActive(false);
         }
     }
 }

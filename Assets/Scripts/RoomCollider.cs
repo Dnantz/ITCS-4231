@@ -9,15 +9,15 @@ public class RoomCollider : MonoBehaviour
      */
 
     public GameObject room; //Passed in from RoomIdentifier
-    public GameObject player;
+    public GameObject mainCanvas;
     public FloorManager fm;
     public GameObject currentRoom;
 
     // Start is called before the first frame update
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player");
-        fm = player.GetComponent<FloorManager>();
+        mainCanvas = GameObject.FindGameObjectWithTag("Canvas");
+        fm = mainCanvas.GetComponent<FloorManager>();
     }
 
     // Update is called once per frame
@@ -32,6 +32,7 @@ public class RoomCollider : MonoBehaviour
 
         if (other.gameObject.tag == "Player" && currentRoom != room)
         {
+            Debug.Log("Entered New Room" + room);
             fm.setCurrentRoom(room);
         }
     }

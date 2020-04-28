@@ -30,6 +30,7 @@ public class FloorManager : MonoBehaviour
     public GameObject oldCurrentRoom;
     public GameObject mainCanvas;
     public MinimapManager mmManager;
+    public PauseMenuControls pm;
 
     int gridsize;
     int numOfRoomsCreated = 0;
@@ -43,10 +44,12 @@ public class FloorManager : MonoBehaviour
         gridsize = 9;
         startingLocation = new Vector3(playerTrans.position.x, playerTrans.position.y - 2, playerTrans.position.z);
         floor = generateFloor(gridsize);
-
-        mainCanvas = GameObject.FindGameObjectWithTag("Canvas");
+        Debug.Log("FLOOR GENERATED");
+        mainCanvas = this.gameObject;
         mmManager = mainCanvas.GetComponent<MinimapManager>();
         mmManager.generate();
+        Debug.Log("MINIMAP GENERATED");
+        pm = mainCanvas.GetComponent<PauseMenuControls>();
 
         Debug.Log("Floor Manager initialized");
         Debug.Log("timescale:" + Time.timeScale);
@@ -56,16 +59,22 @@ public class FloorManager : MonoBehaviour
     void FixedUpdate()
     {
         
-        if (Globals.getRemainingEnemyCount() == 0 && started)
+        if (Globals.getRemainingEnemyCount() == 0 && started && !pm.paused)
         {
-            Debug.Log("No enemies remaining, moving to next floor");
-            Time.timeScale += 0.2f;
-            started = false;
-            UnityEngine.SceneManagement.SceneManager.LoadScene("NDIA_Character_Controller_Scene");
+            if (checkIfCleared())
+            {
+                Debug.Log("No enemies remaining, moving to next floor");
+                Time.timeScale += 0.2f;
+                started = false;
+                Globals.addScore(pm.timeLeft);
+                playerTrans.gameObject.SetActive(false);
+                Cursor.visible = true;
+                UnityEngine.SceneManagement.SceneManager.LoadScene("NextLevelScene");
+            }
         }
         
 
-        // kill all enemies utility
+        // kill all enemies in the current room
         if (Input.GetKey(KeyCode.K))
         {
             GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
@@ -77,31 +86,53 @@ public class FloorManager : MonoBehaviour
                 script.kill();
             }
         }
+
+        // skip to next level
+        if (Input.GetKey(KeyCode.N) && started)
+        {
+            Debug.Log("No enemies remaining, moving to next floor");
+            Time.timeScale += 0.2f;
+            started = false;
+            Globals.addScore(pm.timeLeft);
+            playerTrans.gameObject.SetActive(false);
+            Cursor.visible = true;
+            UnityEngine.SceneManagement.SceneManager.LoadScene("NextLevelScene");
+        }
     }
 
     public void setCurrentRoom(GameObject cRoom)
     {
-        Debug.Log("Setting Current Room");
+        Debug.Log(cRoom + " is it " + currentRoom); 
 
         if (cRoom != currentRoom)
         {
+            Debug.Log("Setting Current Room");
             if (oldCurrentRoom != null)
             {
                 oldCurrentRoom = currentRoom;
                 currentRoom = cRoom;
-                cRoom.GetComponent<RoomIdentifier>().spawn();
+                currentRoom.GetComponent<RoomIdentifier>().spawn();
+                oldCurrentRoom.GetComponent<RoomIdentifier>().despawn();
                 mmManager.updateMap(currentRoom, "red");
-                mmManager.updateMap(oldCurrentRoom, "white");
+                if (checkIfCleared(oldCurrentRoom))
+                {
+                    mmManager.updateMap(oldCurrentRoom, "green");
+                } else
+                {
+                   mmManager.updateMap(oldCurrentRoom, "white");
+                }
             }
             else
             {
+                Debug.Log("Special Case");
                 oldCurrentRoom = cRoom;
                 currentRoom = cRoom;
-                cRoom.GetComponent<RoomIdentifier>().spawn();
+                currentRoom.GetComponent<RoomIdentifier>().spawn();
                 started = true;
                 mmManager.updateMap(currentRoom, "red");
             }
         }
+        Debug.Log("sameroom");
     }
 
     GameObject[,] generateFloor(int size, int maxRooms = 10)
@@ -284,5 +315,35 @@ public class FloorManager : MonoBehaviour
         }
         Debug.Log("Number of Total Rooms: " + numOfRoomsCreated.ToString());
         return rooms;
+    }
+
+    public bool checkIfCleared()
+    {
+        RoomIdentifier ri;
+
+        for (int i = 0; i < 10; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                if (floor[i, j] != null)
+                {
+                    ri = floor[i, j].GetComponent<RoomIdentifier>();
+                    if (!ri.cleared)
+                    {
+                        Debug.Log("Check If ALL Cleared: FALSE");
+                        return false;
+                    }
+                }
+            }
+        }
+        Debug.Log("Check If ALL Cleared: TRUE");
+        return true;
+    }
+
+    public bool checkIfCleared(GameObject room)
+    {
+        RoomIdentifier ri = room.GetComponent<RoomIdentifier>();
+        return ri.cleared;
+
     }
 }

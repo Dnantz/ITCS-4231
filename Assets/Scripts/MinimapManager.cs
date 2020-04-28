@@ -11,6 +11,7 @@ public class MinimapManager : MonoBehaviour
      */
 
     [SerializeField] GameObject player;
+    [SerializeField] GameObject mainCanvas;
     FloorManager fm;
     [SerializeField] Texture2D mapSquare;
     [SerializeField] Canvas mapCanvas;
@@ -20,6 +21,7 @@ public class MinimapManager : MonoBehaviour
     Texture2D emptySquare;
     Texture2D centerSquare;
     Texture2D blankSquare;
+    Texture2D clearedSquare;
     Texture2D[,] mapGrid;
     int mapRStart = -1;
     int mapREnd = -1;
@@ -31,11 +33,12 @@ public class MinimapManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        fm = player.GetComponent<FloorManager>();
+        fm = mainCanvas.GetComponent<FloorManager>();
         emptySquare = Resources.Load("minimapSquare") as Texture2D;
         centerSquare = Resources.Load("centerSquare") as Texture2D;
-        bool boolC = false;
-        bool boolR = false;
+        clearedSquare = Resources.Load("clearedSquare") as Texture2D;
+        //bool boolC = false;
+        //bool boolR = false;
     }
 
         /*
@@ -227,17 +230,24 @@ public class MinimapManager : MonoBehaviour
             {
                 if (floor[i, j] == room)
                 {
-                    if (color.Equals("red"))
+                    if (color.Equals("red")) //Player in room
                     {
                         mapGrid[i, j] = centerSquare;
-                        Debug.Log("Updated Minimap");
+                        Debug.Log("Updated Minimap RED");
                         break;
                     }
 
-                    if (color.Equals("white"))
+                    if (color.Equals("white")) //Player still needs to clear room
                     {
                         mapGrid[i, j] = emptySquare;
-                        Debug.Log("Updated Minimap");
+                        Debug.Log("Updated Minimap WHITE");
+                        break;
+                    }
+
+                    if (color.Equals("green")) //Room cleared
+                    {
+                        mapGrid[i, j] = clearedSquare;
+                        Debug.Log("Updated Minimap GREEN");
                         break;
                     }
                 }
