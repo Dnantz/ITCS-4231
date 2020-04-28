@@ -102,11 +102,11 @@ public class FloorManager : MonoBehaviour
 
     public void setCurrentRoom(GameObject cRoom)
     {
-        Debug.Log(cRoom + " is it " + currentRoom); 
+        //Debug.Log(cRoom + " is it " + currentRoom); 
 
         if (cRoom != currentRoom)
         {
-            Debug.Log("Setting Current Room");
+            //Debug.Log("Setting Current Room");
             if (oldCurrentRoom != null)
             {
                 oldCurrentRoom = currentRoom;
@@ -124,7 +124,7 @@ public class FloorManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("Special Case");
+                //Debug.Log("Special Case");
                 oldCurrentRoom = cRoom;
                 currentRoom = cRoom;
                 currentRoom.GetComponent<RoomIdentifier>().spawn();
@@ -132,7 +132,7 @@ public class FloorManager : MonoBehaviour
                 mmManager.updateMap(currentRoom, "red");
             }
         }
-        Debug.Log("sameroom");
+        //Debug.Log("sameroom");
     }
 
     GameObject[,] generateFloor(int size, int maxRooms = 10)

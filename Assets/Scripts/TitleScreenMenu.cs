@@ -7,7 +7,9 @@ using TMPro;
 public class TitleScreenMenu : MonoBehaviour
 {
     string sceneName;
+    bool tutUp = false;
     [SerializeField] GameObject displayObj;
+    [SerializeField] GameObject tutPanel;
     TextMeshProUGUI display;
 
     // Start is called before the first frame update
@@ -15,6 +17,11 @@ public class TitleScreenMenu : MonoBehaviour
     {
         Cursor.visible = true;
         sceneName = SceneManager.GetActiveScene().name;
+
+        if (sceneName.Equals("TitleScene"))
+        {
+            tutPanel.SetActive(false);
+        }
 
         if (sceneName.Equals("NextLevelScene"))
         {
@@ -32,14 +39,25 @@ public class TitleScreenMenu : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (tutUp && Input.GetMouseButton(0))
+        {
+            tutPanel.SetActive(false);
+            tutUp = false;
+        }
+
         if (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.Return))
         {
-            if (sceneName.Equals("TitleScene") || sceneName.Equals("NextLevelScene"))
+            if (tutUp)
+            {
+                tutPanel.SetActive(false);
+                tutUp = false;
+            }
+            else if (sceneName.Equals("TitleScene") || sceneName.Equals("NextLevelScene"))
             {
                 startGame();
             }
 
-            if (sceneName.Equals("EndScene"))
+            else if (sceneName.Equals("EndScene"))
             {
                 Globals.resetScore();
                 toMain();
@@ -73,5 +91,11 @@ public class TitleScreenMenu : MonoBehaviour
     public void exitGame()
     {
         Application.Quit();
+    }
+
+    public void tutScreen(bool open)
+    {
+        tutPanel.SetActive(open);
+        tutUp = open;
     }
 }

@@ -12,6 +12,7 @@ public static class Globals
 
     public static void resetScore()
     {
+        Time.timeScale = 1;
         score = 0;
     }
 

@@ -128,8 +128,8 @@ public class MinimapManager : MonoBehaviour
         public void generate()
     {
         floor = fm.floor;
-        Debug.Log("FLOOR ARRAY:");
-        Debug.Log(floor[1, 1]);
+        //Debug.Log("FLOOR ARRAY:");
+        //Debug.Log(floor[1, 1]);
         //Print floor array
         for (int i = 0; i < 10; i++)
         {
@@ -145,7 +145,7 @@ public class MinimapManager : MonoBehaviour
                     rowString += "- ";
                 }
             }
-            Debug.Log(rowString);
+            //Debug.Log(rowString);
         }
 
         mapGrid = new Texture2D[10,10];
@@ -156,7 +156,7 @@ public class MinimapManager : MonoBehaviour
             {
                 if (floor[i,j] != null)
                 {
-                    Debug.Log("Added minimap square");
+                    //Debug.Log("Added minimap square");
                         mapGrid[i, j] = emptySquare;
                 }
             }
@@ -233,21 +233,21 @@ public class MinimapManager : MonoBehaviour
                     if (color.Equals("red")) //Player in room
                     {
                         mapGrid[i, j] = centerSquare;
-                        Debug.Log("Updated Minimap RED");
+                        Debug.Log("Updated Minimap");
                         break;
                     }
 
                     if (color.Equals("white")) //Player still needs to clear room
                     {
                         mapGrid[i, j] = emptySquare;
-                        Debug.Log("Updated Minimap WHITE");
+                        Debug.Log("Updated Minimap");
                         break;
                     }
 
                     if (color.Equals("green")) //Room cleared
                     {
                         mapGrid[i, j] = clearedSquare;
-                        Debug.Log("Updated Minimap GREEN");
+                        Debug.Log("Updated Minimap");
                         break;
                     }
                 }

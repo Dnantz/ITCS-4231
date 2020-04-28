@@ -27,7 +27,7 @@ public class PlayerHitbox : MonoBehaviour
         if (collision.gameObject.tag == "Bullet")
         {
             Debug.Log("SHOT");
-            pm.subtractTime(1);
+            pm.subtractTime(2);
             Destroy(collision.gameObject);
         }
 
