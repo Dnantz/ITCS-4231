@@ -48,6 +48,7 @@ public class FloorManager : MonoBehaviour
         mmManager.generate();
 
         Debug.Log("Floor Manager initialized");
+        Debug.Log("timescale:" + Time.timeScale);
     }
 
     void FixedUpdate()
@@ -55,7 +56,7 @@ public class FloorManager : MonoBehaviour
         if (Globals.getRemainingEnemyCount() == 0)
         {
             Debug.Log("No enemies remaining, moving to next floor");
-            Globals.timescale += 0.2f;
+            Time.timeScale += 0.2f;
             UnityEngine.SceneManagement.SceneManager.LoadScene("NDIA_Character_Controller_Scene");
         }
 
